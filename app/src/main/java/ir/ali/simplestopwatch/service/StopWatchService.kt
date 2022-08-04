@@ -22,22 +22,24 @@ class StopWatchService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        val time = intent.getDoubleExtra(TIME, 0.0)
-        timer.scheduleAtFixedRate(StopWatchTimerTask(time), 0, 1000)
+        Thread(Runnable {
+            val time = intent.getDoubleExtra(TIME, 0.0)
+            timer.scheduleAtFixedRate(StopWatchTimerTask(time), 0, 1000)
 
-        val channelId = "foreground service channel Id"
-        val channel = NotificationChannel(
-            channelId, channelId,
-            NotificationManager.IMPORTANCE_LOW
-        )
-        getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
+            val channelId = "foreground service channel Id"
+            val channel = NotificationChannel(
+                channelId, channelId,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
 
-        val builder = Notification.Builder(applicationContext, channelId)
-            .setContentTitle("Timer Notification")
-            .setContentText("Foreground Service Running ..")
-            .setSmallIcon(android.R.drawable.stat_notify_chat)
-        startForeground(100, builder.build())
+            val builder = Notification.Builder(applicationContext, channelId)
+                .setContentTitle("Timer Notification")
+                .setContentText("Foreground Service Running ..")
+                .setSmallIcon(android.R.drawable.stat_notify_chat)
+            startForeground(100, builder.build())
 
+        }).start()
         return START_NOT_STICKY
     }
 
